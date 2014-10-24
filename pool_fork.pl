@@ -3,6 +3,7 @@
 
 use AnyEvent;
 use AnyEvent::Fork::Pool;
+use Data::Printer;
 use lib './lib';
 
 my $pool = AnyEvent::Fork
@@ -13,11 +14,13 @@ my $pool = AnyEvent::Fork
         on_destroy => (my $finish = AE::cv),
         max => 4);
 
+my $global = {};
 
-for (1..100) {
-    $pool->( ($_,$_+1), sub {
+for my $input (1..100) {
+    $pool->( ($input,$input+1), sub {
         my ($return) = @_;
-        print $return."\n";
+        $global->{$input}=$return."\n";
+        p $global;
     });
 }
 
